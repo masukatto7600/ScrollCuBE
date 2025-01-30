@@ -211,9 +211,7 @@ app.post('/', ensureAuthenticated(), async (c) => {
     recodedAt: new Date(),
     highScore: parseInt(body.allOver ||'0'),
     monthly: parseInt(body.monthly ||'0'),
-    lastMonth: 0,
     daily: parseInt(body.daily ||'0'),
-    yesterDay: 0,
     distance: parseInt(body.distance ||'0')
   });
 
