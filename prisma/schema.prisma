@@ -28,9 +28,7 @@ model Ranking {
   recodedAt DateTime @db.Timestamptz(6)
   highScore Int
   monthly   Int
-  lastMonth Int
   daily     Int
-  yesterDay Int
   distance  Int
 
   @@map(name: "rankings")
