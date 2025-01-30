@@ -65,7 +65,13 @@ app.get("/", async (c) => {
 
   const myScore = user ? await prisma.ranking.findFirst({
   where: {userId: user.id },
-  }): undefined;
+  }) || {
+    updatedAt: setDateId(new Date()),
+    highScore: 0,
+    monthly: 0,
+    daily: 0,
+    distance: 0,
+  }: undefined;
   if(myScore) {
     if(myScore.updatedAt !== setDateId(new Date())) {
       myScore.daily = 0;
@@ -75,7 +81,7 @@ app.get("/", async (c) => {
     }
   }
 
-  logger.debug(`${myScore}`);
+  logger.debug(myScore);
 
   const emptyRanking = Array(10).fill( {
     user: { username: '---' },
@@ -145,7 +151,7 @@ app.get("/", async (c) => {
             : html`
               <tr class="rank-my">
                 <td class="my-number "style="font-size: 0.8rem;">圏外</td>
-                <td class="ranking-name">${user ? user.login : html`<span style="font-size: 0.8rem;">ゲスト ユーザー</span>`}</td>
+                <td class="ranking-name" style="font-size: 0.8rem;">ゲスト ユーザー</td>
                 <td class="my-number">----</td>
               </tr>
             `}
