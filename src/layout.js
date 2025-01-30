@@ -6,10 +6,18 @@ function layout(c, title, body) {
     <html>
       <head>
         <title>${title}</title>
-        <link rel="stylesheet" href="/stylesheets/style.css" />
+        <link rel="icon" href="/images/favicon.ico">
+        <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          integrity="sha256-fx038NkLY4U1TCrBDiu5FWPEa9eiZu01EiLryshJbCo="
+          crossorigin="anonymous">
+        <link rel="stylesheet" href="/stylesheets/style.css">
       </head>
       <body>
         ${body}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha256-qlPVgvl+tZTCpcxYJFdHB/m6mDe84wRr+l81VoYPTgQ="
+          crossorigin="anonymous"></script>
       </body>
     </html>
   `;

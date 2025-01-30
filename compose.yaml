@@ -13,3 +13,12 @@ services:
     build:
       context: "."
       dockerfile: "db.Dockerfile"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: scroll_cube
+    volumes:
+      - scroll-cube-score:/var/lib/postgresql/data
+volumes:
+  scroll-cube-score:
+    external: true
