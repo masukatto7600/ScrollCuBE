@@ -96,17 +96,18 @@ app.get("/", async (c) => {
       c,
       "ScrollCuBE",
       html`
-        ${user
-        ? html`
-          <div>
-            <a href="/logout">${user.login} をログアウト</a>
+        <nav class="navbar fixed-top bg-info">
+          <div class="container-fluid">
+            <h1 class="text-light navbar-brand mx-auto">ScrollCuBE WEB Edition</h1>
+            <div class="dropdown">
+              <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
+                ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
+                <li><a class="dropdown-item" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
+              </ul>
+            </div>
           </div>
-        `
-        : html`
-          <div>
-            <a href="/login">ログイン</a>
-          </div>
-        `}
+        </nav>
 
         ${tag.gameDisplay}
         ${tag.scoreForm}
@@ -152,7 +153,7 @@ app.get("/", async (c) => {
               <tr class="rank-my">
                 <td class="my-number "style="font-size: 0.8rem;">圏外</td>
                 <td class="ranking-name" style="font-size: 0.8rem;">ゲスト ユーザー</td>
-                <td class="my-number">----</td>
+                <td class="my-number">---</td>
               </tr>
             `}
             </table>
@@ -229,48 +230,22 @@ function setData(ranking, data) {
     const value = data;
     const toDay = setDateId(new Date());
 
-    const yesterDay = () => {
-      let now = new Date();
-      now.setDate(now.getDate() - 1);
-      now = setDateId(now);
-      return now;
-    };
-
-    const lastMonth = () => {
-      let now = new Date();
-      now.setMonth(now.getMonth() - 1);
-      now = toMonthly(setDateId);
-      return now;
-    };
-
+    if(value.updatedAt !== toDay) {
+      value.toDay = 0;
+    }
+    if(toMonthly(value.updatedAt) !== toMonthly(toDay)) {
+      value.monthly = 0;
+    }
 
     if(ranking !== null) {
       if(ranking.highScore > value.highScore) {
         value.highScore = ranking.highScore;
         value.recodedAt = ranking.recodedAt;
       }
-
-      if(value.updatedAt !== toDay) {
-        value.toDay = 0;
-      }
-      if(ranking.updatedAt === yesterDay) {
-        value.yesterDay = ranking.daily;
-      } else if(ranking.updatedAt !== toDay) {
-        value.yesterDay = 0;
-      }
-      else if(ranking.daily > value.daily) {
+      if(ranking.daily > value.daily && ranking.updatedAt === toDay) {
         value.daily = ranking.daily;
       }
-  
-      if(toMonthly(value.updatedAt) !== toMonthly(toDay)) {
-        value.monthly = 0;
-      }
-      if(toMonthly(ranking.updatedAt) === lastMonth) {
-        value.lastMonth = ranking.monthly;
-      } else if(toMonthly(ranking.updatedAt) !== toMonthly(toDay)) {
-        value.lastMonth = 0;
-      }
-      else if(ranking.monthly > value.monthly) {
+      if(ranking.monthly > value.monthly && toMonthly(ranking.updatedAt) === toMonthly(toDay)) {
         value.monthly = ranking.monthly;
       }
     }

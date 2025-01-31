@@ -1,5 +1,5 @@
 body {
-  padding: 50px;
+  padding: 80px 50px;
 }
 
 #ranking-tab, #ranking {
@@ -8,10 +8,6 @@ body {
     Helvetica,
     Arial,
     sans-serif;
-}
-
-a {
-  color: #00b7ff;
 }
 
 tr {
