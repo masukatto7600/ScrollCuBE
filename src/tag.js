@@ -1,5 +1,23 @@
 const { html } = require("hono/html");
 
+const header = (user, distance) => { return html`
+  <nav class="navbar fixed-top bg-info">
+    <div class="container-fluid">
+      <h1 class="text-light navbar-brand mx-auto">ScrollCuBE WEB Edition</h1>
+      <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
+          ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
+          <li>
+            <a class="dropdown-item" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a>
+          </li>
+          ${user ? html`<li class="dropdown-item">Best: ${(distance / 100).toFixed(2)}m</li>` : "" }
+        </ul>
+      </div>
+    </div>
+  </nav>
+`};
+
 const gameDisplay = html`
   <div id="unity-container" class="unity-desktop">
     <canvas id="unity-canvas" width=800 height=450 tabindex="-1"></canvas>
@@ -76,32 +94,32 @@ const gameScript1 = html`
 `;
 
 const gameScript2 = html`
-    loadingBar.style.display = "block";
+  loadingBar.style.display = "block";
 
-    var script = document.createElement("script");
-    script.src = loaderUrl;
-    script.onload = () => {
-      createUnityInstance(canvas, config, (progress) => {
-        progressBarFull.style.width = 100 * progress + "%";
-            }).then((unityInstance) => {
-              window.unityInstance = unityInstance;
+  var script = document.createElement("script");
+  script.src = loaderUrl;
+  script.onload = () => {
+    createUnityInstance(canvas, config, (progress) => {
+      progressBarFull.style.width = 100 * progress + "%";
+          }).then((unityInstance) => {
+            window.unityInstance = unityInstance;
 
-              loadingBar.style.display = "none";
-              fullscreenButton.onclick = () => {
-                unityInstance.SetFullscreen(1);
-              };
-            }).catch((message) => {
-              alert(message);
-            });
-          };
+            loadingBar.style.display = "none";
+            fullscreenButton.onclick = () => {
+              unityInstance.SetFullscreen(1);
+            };
+          }).catch((message) => {
+            alert(message);
+          });
+        };
 
-    document.body.appendChild(script);
+  document.body.appendChild(script);
 `;
 
-const scoreForm = html`
+const form = html`
   <h2>スコア送信</h2>
   <ul>
-    <li>マイスコアの「本日1位」を更新した場合に自動入力されます。</li>
+    <li>ランキング上の「マイスコア」を更新した場合に自動入力されます。</li>
     <li>過去の記録は送信できません。</li>
     <li>ゲストユーザーは送信できません。</li>
   </ul>
@@ -117,6 +135,89 @@ const scoreForm = html`
     <button type="submit" id="submit_button" class="btn btn-primary">送信</button>
   </form>
 `;
+
+const formScript = (myScore) => { return html`
+  const daily = document.getElementById('daily');
+  const distance = document.getElementById('distance');
+  const button = document.getElementById('submit_button');
+  function buttonActive() {
+    if(${Boolean(myScore).toString()} && (daily.value || distance.value)) {
+      button.disabled = false;
+    }
+    else {
+      button.disabled = true;
+    }
+  }
+  
+    buttonActive();
+
+    if(!${Boolean(myScore).toString()}) {
+      button.classList.remove('btn-primary');
+      button.classList.add('btn-secondary');
+    }
+
+  const getMyScore = () => {
+    return ${myScore ? `{
+      allOver: ${myScore.highScore},
+      monthly: ${myScore.monthly},
+      daily: ${myScore.daily},
+      distance: ${myScore.distance},
+    }` : 'undefined'};
+  };
+`
+};
+
+const help = html`
+
+`;
+
+const ranking0 = (rankings) => {
+  const emptyRanking = Array(10).fill( {
+    user: { username: '---' },
+    highScore: '---',
+    monthly: '---',
+    daily: '---',
+    distance: '---'
+  });
+
+  return html`
+    <h3>${rankings.title}</h3>
+    <table>
+    ${rankings.value.concat(emptyRanking).slice(0, 10).map(
+    (ranking, i) => html`
+      <tr class="rank-${i}">
+        <td class="number">${i + 1}</td>
+        <td class="ranking-name">${ranking.user.username}</td>
+        <td class="result">${ranking[rankings.type]}</td>
+      </tr>
+    `,
+    )}
+      <tr style="background-color: #84e25f">
+        <th style="text-align: right; padding-right: 0.3rem;">▼</th>
+        <th style="text-align: left; padding-left: 2rem;">マイスコア</th>
+        <th style="text-align: right; padding-right: 0.7rem;">▼</th>
+      </tr>
+`};
+
+const ranking1 = (rankings, myScore, user) => { return html`
+  ${myScore 
+  ? html`
+    <tr class="rank-${rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) ?? 'my'}" style="height: 1.7rem;">
+      <td class="my-number" style="font-size: 1.1rem;">${user ? rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) + 1 
+      || html`<span style="font-size: 0.8rem;">圏外</span>` : html`<span style="font-size: 0.8rem;">圏外</span>`}</td>
+      <td class="ranking-name">${user.login}</td>
+      <td class="my-number" style="font-size: 0.95rem;">${myScore[rankings.type] || 0}</td>
+    </tr>
+  `
+  : html`
+    <tr class="rank-my">
+      <td class="my-number "style="font-size: 0.8rem;">圏外</td>
+      <td class="ranking-name" style="font-size: 0.8rem;">ゲスト ユーザー</td>
+      <td class="my-number">---</td>
+    </tr>
+  `}
+  </table>
+`};
 
 const rankingScript = html`
   const tabs = document.getElementById('ranking-tab').getElementsByTagName('a');
@@ -151,10 +252,15 @@ const rankingScript = html`
 `;
 
 module.exports = { 
+  header,
   gameDisplay,
   gameScript0, 
   gameScript1,
   gameScript2,
-  scoreForm,
+  form,
+  formScript,
+  ranking0,
+  ranking1,
   rankingScript,
+  help,
 };

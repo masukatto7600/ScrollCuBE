@@ -81,36 +81,15 @@ app.get("/", async (c) => {
     }
   }
 
-  logger.debug(myScore);
-
-  const emptyRanking = Array(10).fill( {
-    user: { username: '---' },
-    highScore: '---',
-    monthly: '---',
-    daily: '---',
-    distance: '---'
-  });
-
   return c.html(
     layout(
       c,
       "ScrollCuBE",
       html`
-        <nav class="navbar fixed-top bg-info">
-          <div class="container-fluid">
-            <h1 class="text-light navbar-brand mx-auto">ScrollCuBE WEB Edition</h1>
-            <div class="dropdown">
-              <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
-                ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
-                <li><a class="dropdown-item" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+        ${tag.header(user, myScore ? myScore.distance : undefined)}
 
         ${tag.gameDisplay}
-        ${tag.scoreForm}
+        ${tag.form}
 
         <h2>スコアランキング</h2>
         <p id="ranking-tab">
@@ -119,77 +98,23 @@ app.get("/", async (c) => {
           <a href="#ranking-${onlineScore.indexOf(rankings)}">${rankings.title}</a>
         `)}
         </p>
-
         <div id="ranking">
         ${onlineScore.map(
         (rankings) => html`
           <div id="ranking-${onlineScore.indexOf(rankings)}" style="width: fit-content;">
-            <h3>${rankings.title}</h3>
-            <table>
-            ${rankings.value.concat(emptyRanking).slice(0, 10).map(
-            (ranking, i) => html`
-              <tr class="rank-${i}">
-                <td class="number">${i + 1}</td>
-                <td class="ranking-name">${ranking.user.username}</td>
-                <td class="result">${ranking[rankings.type]}</td>
-              </tr>
-            `,
-            )}
-              <tr style="background-color: #84e25f">
-                <th style="text-align: right; padding-right: 0.3rem;">▼</th>
-                <th style="text-align: left; padding-left: 2rem;">マイスコア</th>
-                <th style="text-align: right; padding-right: 0.7rem;">▼</th>
-              </tr>
-            ${myScore 
-            ? html`
-              <tr class="rank-${rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) ?? 'my'}" style="height: 1.7rem;">
-                <td class="my-number" style="font-size: 1.1rem;">${user ? rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) + 1 
-                || html`<span style="font-size: 0.8rem;">圏外</span>` : html`<span style="font-size: 0.8rem;">圏外</span>`}</td>
-                <td class="ranking-name">${user.login}</td>
-                <td class="my-number" style="font-size: 0.95rem;">${myScore[rankings.type] || 0}</td>
-              </tr>
-            `
-            : html`
-              <tr class="rank-my">
-                <td class="my-number "style="font-size: 0.8rem;">圏外</td>
-                <td class="ranking-name" style="font-size: 0.8rem;">ゲスト ユーザー</td>
-                <td class="my-number">---</td>
-              </tr>
-            `}
-            </table>
+            ${tag.ranking0(rankings)}
+            ${tag.ranking1(rankings, myScore, user)}
           </div>
           `)}
         </div>
+
+        <h2>遊び方</h2>
 
         <script>
         ${tag.gameScript0}
         ${tag.gameScript1}
         ${tag.gameScript2}
-
-        const daily = document.getElementById('daily');
-        const distance = document.getElementById('distance');
-        const button = document.getElementById('submit_button');
-        function buttonActive() {
-          if(Boolean('${user}') ? (daily.value || distance.value): false) {
-            console.log(daily.value);
-            button.disabled = false;
-          }
-          else {
-            button.disabled = true;
-          }
-        }
-        
-        window.onload = buttonActive();
-
-        const getMyScore = () => {
-          return ${myScore ? `{
-            allOver: ${myScore.highScore},
-            monthly: ${myScore.monthly},
-            daily: ${myScore.daily},
-            distance: ${myScore.distance},
-          }` : 'undefined'};
-        };
-
+        ${tag.formScript(myScore)}
         ${tag.rankingScript}
         </script>
         <script src="unity-bridge.js"></script>
@@ -247,6 +172,9 @@ function setData(ranking, data) {
       }
       if(ranking.monthly > value.monthly && toMonthly(ranking.updatedAt) === toMonthly(toDay)) {
         value.monthly = ranking.monthly;
+      }
+      if(ranking.distance > value.distance) {
+        value.distance = ranking.distance;
       }
     }
     return value;
