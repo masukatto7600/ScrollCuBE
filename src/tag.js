@@ -8,10 +8,9 @@ const header = (user, distance) => { return html`
         <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
           ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
-          <li>
-            <a class="dropdown-item" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a>
-          </li>
-          ${user ? html`<li class="dropdown-item">Best: ${(distance / 100).toFixed(2)}m</li>` : "" }
+          ${user ? html`<li class="dropdown-item">最高距離: ${(distance / 100).toFixed(2)}m</li>` : "" }
+          <li><button class="btn dropdown-item" type="button" onclick="change()">レイアウト切替</button></li>
+          <li><a class="dropdown-item" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
         </ul>
       </div>
     </div>
@@ -37,29 +36,29 @@ const gameDisplay = html`
 `;
 
 const gameScript0 = html`
-    var container = document.querySelector("#unity-container");
-    var canvas = document.querySelector("#unity-canvas");
-    var loadingBar = document.querySelector("#unity-loading-bar");
-    var progressBarFull = document.querySelector("#unity-progress-bar-full");
-    var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-    var warningBanner = document.querySelector("#unity-warning");
-    function unityShowBanner(msg, type) {
-      function updateBannerVisibility() {
-        warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-      }
-      var div = document.createElement('div');
-      div.innerHTML = msg;
-      warningBanner.appendChild(div);
-      if (type == 'error') div.style = 'background: red; padding: 10px;';
-      else {
-        if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-        setTimeout(function() {
-          warningBanner.removeChild(div);
-          updateBannerVisibility();
-        }, 5000);
-      }
-      updateBannerVisibility();
+  var container = document.querySelector("#unity-container");
+  var canvas = document.querySelector("#unity-canvas");
+  var loadingBar = document.querySelector("#unity-loading-bar");
+  var progressBarFull = document.querySelector("#unity-progress-bar-full");
+  var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+  var warningBanner = document.querySelector("#unity-warning");
+  function unityShowBanner(msg, type) {
+    function updateBannerVisibility() {
+      warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
     }
+    var div = document.createElement('div');
+    div.innerHTML = msg;
+    warningBanner.appendChild(div);
+    if (type == 'error') div.style = 'background: red; padding: 10px;';
+    else {
+      if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+      setTimeout(function() {
+        warningBanner.removeChild(div);
+        updateBannerVisibility();
+      }, 5000);
+    }
+    updateBannerVisibility();
+  }
 `;
 
 const gameScript1 = html`
@@ -70,7 +69,7 @@ const gameScript1 = html`
     frameworkUrl: buildUrl + "/ScrollCuBE.framework.js",
     codeUrl: buildUrl + "/ScrollCuBE.wasm",
     streamingAssetsUrl: "StreamingAssets",
-    companyName: "DefaultCompany",
+    companyName: "dokomiCompany",
     productName: "ScrollCuBE",
     productVersion: "1.0",
     showBanner: unityShowBanner,
@@ -117,44 +116,48 @@ const gameScript2 = html`
 `;
 
 const form = html`
-  <h2>スコア送信</h2>
-  <ul>
-    <li>ランキング上の「マイスコア」を更新した場合に自動入力されます。</li>
-    <li>過去の記録は送信できません。</li>
-    <li>ゲストユーザーは送信できません。</li>
-  </ul>
-  <form method="post">
-    <label for="daily">本日</label>
-    <input type="number" name="daily" id="daily" style="width:4em;" readonly>
-    <label for="monthly">月間</label>
-    <input type="number" name="monthly" id="monthly" style="width:4em;" readonly>
-    <label for="allOver">総合</label>
-    <input stype="number" name="allOver" id="allOver" style="width:4em;" readonly>
-    <label for="distance">最高距離</label>
-    <input type="number" name="distance" id="distance" style="width:5em;" readonly>
-    <button type="submit" id="submit_button" class="btn btn-primary">送信</button>
-  </form>
+  <div class="ms-3">
+    <p>このフォームを送信することで、オンラインスコアランキングに参加・スコアを更新できます。</p>
+    <ul>
+      <li>ランキング上の「マイスコア」を更新した場合に自動入力されます。</li>
+      <li class="fw-bold"><span class="text-danger">ページを再読み込みすると入力されたデータが消えます。</span>また、過去の記録は送信できません。</li>
+      <li>ゲストユーザーは送信できません。</li>
+    </ul>
+    <form method="post">
+      <label for="daily">本日</label>
+      <input type="number" name="daily" id="daily" style="width:4em;" readonly>
+      <label for="monthly">月間</label>
+      <input type="number" name="monthly" id="monthly" style="width:4em;" readonly>
+      <label for="allOver">総合</label>
+      <input stype="number" name="allOver" id="allOver" style="width:4em;" readonly>
+      <label for="distance">最高距離</label>
+      <input type="number" name="distance" id="distance" style="width:5em;" readonly>
+      <button type="submit" onclick="send()" id="submit_button" class="btn btn-success" disabled><i id="send-icon" class="bi-send"></i></button>
+    </form>
+  </div>
 `;
 
 const formScript = (myScore) => { return html`
   const daily = document.getElementById('daily');
   const distance = document.getElementById('distance');
   const button = document.getElementById('submit_button');
+  const icon = document.getElementById('send-icon');
+  let isSend = false;
+
+  if(!${Boolean(myScore).toString()}) {
+    button.classList.remove('btn-success');
+    button.classList.add('btn-secondary');
+    icon.classList.remove('bi-send');
+    icon.classList.add('bi-send-slash');
+  }
+
   function buttonActive() {
     if(${Boolean(myScore).toString()} && (daily.value || distance.value)) {
       button.disabled = false;
-    }
-    else {
-      button.disabled = true;
+      icon.classList.remove('bi-send');
+      icon.classList.add('bi-send-check-fill');
     }
   }
-  
-    buttonActive();
-
-    if(!${Boolean(myScore).toString()}) {
-      button.classList.remove('btn-primary');
-      button.classList.add('btn-secondary');
-    }
 
   const getMyScore = () => {
     return ${myScore ? `{
@@ -164,14 +167,20 @@ const formScript = (myScore) => { return html`
       distance: ${myScore.distance},
     }` : 'undefined'};
   };
-`
-};
 
-const help = html`
+  function send() {
+  isSend = true;
+  }
 
-`;
+  window.addEventListener('beforeunload', function (event) {
+    if(!(button.disabled || isSend)) {
+      event.preventdokomi()
+      event.returnValue = ''
+    }
+  });
+`};
 
-const ranking0 = (rankings) => {
+const ranking0 = (rankings, id) => {
   const emptyRanking = Array(10).fill( {
     user: { username: '---' },
     highScore: '---',
@@ -181,13 +190,13 @@ const ranking0 = (rankings) => {
   });
 
   return html`
-    <h3>${rankings.title}</h3>
+    <h4>${rankings.title}</h4>
     <table>
     ${rankings.value.concat(emptyRanking).slice(0, 10).map(
     (ranking, i) => html`
       <tr class="rank-${i}">
-        <td class="number">${i + 1}</td>
-        <td class="ranking-name">${ranking.user.username}</td>
+        <td class="number">${i +1}</td>
+        <td class="ranking-name">${ranking.user.username}${ranking.user.userId === id ? html`<i class="bi-person-square ps-1"></i>` : ''}</td>
         <td class="result">${ranking[rankings.type]}</td>
       </tr>
     `,
@@ -203,7 +212,7 @@ const ranking1 = (rankings, myScore, user) => { return html`
   ${myScore 
   ? html`
     <tr class="rank-${rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) ?? 'my'}" style="height: 1.7rem;">
-      <td class="my-number" style="font-size: 1.1rem;">${user ? rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) + 1 
+      <td class="my-number" style="font-size: 1.1rem;">${user ? rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) +1
       || html`<span style="font-size: 0.8rem;">圏外</span>` : html`<span style="font-size: 0.8rem;">圏外</span>`}</td>
       <td class="ranking-name">${user.login}</td>
       <td class="my-number" style="font-size: 0.95rem;">${myScore[rankings.type] || 0}</td>
@@ -251,6 +260,68 @@ const rankingScript = html`
   tabs[0].onclick();
 `;
 
+const help = html`
+  <div class="ms-3">
+  <h3>このゲームについて</h3>
+    <p>自動横スクロール、エンドレスのジャンプアクションゲームです。</p>
+    <p><i class="bi-arrow-up-square"></i>キー、クリック（タップ）でジャンプ。2段ジャンプも可能です。</p>
+    <p>迫り来る仕掛けやアイテムを駆使し、高得点を目指しましょう。</p>
+    <p>詳しくはゲーム内「Tutorial」をご覧ください。</p>
+  <h3>記録の保存</h3>
+    <p>マイスコアや設定はサイト上に保存されます。</p>
+    <p>最終変更から約1年経過するとデータが消去されます。</p>
+    <p>ログインするとオンラインランキングに参加できます。</p>
+  </div>
+`;
+
+const layoutScript0 = html`
+  const main = document.getElementById('main');
+  const right = document.getElementById('right');
+  const table = document.getElementById('ranking-table');
+  const help = document.getElementById('help-h2');
+
+  const setLayout = [
+    function() {
+      main.style.width = "900px";
+      main.style.display = "block";
+      right.style.flexDirection = "column";
+      help.style.display = "block";
+      table.classList.add('ms-3');
+    },
+    function() {
+      main.style.width = "1000px";
+      main.style.display = "block";
+      right.style.flexDirection = "row";
+      help.style.display = "none";
+      table.classList.remove('ms-3');
+    },
+    function() {
+      main.style.width = "1400px";
+      main.style.display = "flex";
+      right.style.flexDirection = "column-reverse";
+      help.style.display = "none";
+      table.classList.add('ms-3');
+    },
+  ];
+`;
+
+const layoutScript1 = html`
+  let layout = 0;
+
+  window.addEventListener('DOMContentLoaded', function () {
+    const value = GetCookieValue('layout');
+    layout = isNaN('value') ? 0 : value % 3;
+    setLayout[layout]();
+  });
+
+  function change() {
+    layout = (layout +1) % 3;
+    setLayout[layout]();
+  
+    document.cookie = \`layout=\${layout}; max-age=\${366 * 86400}\`;
+  }
+`;
+
 module.exports = { 
   header,
   gameDisplay,
@@ -263,4 +334,6 @@ module.exports = {
   ranking1,
   rankingScript,
   help,
+  layoutScript0,
+  layoutScript1,
 };

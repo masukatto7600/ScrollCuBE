@@ -1,7 +1,13 @@
+let decryptKey = '';
+
+function SetKey(parameter) {
+  decryptKey = parameter;
+}
+
 function SetCookie(parameter) {
   const data = JSON.parse(parameter);
   const cookieID = data.cookieID;
-  const value = data.value;
+  const value = encrypt(data.value, decryptKey);
   const maxAge = 366 * 86400;
 
   document.cookie = `${cookieID}=${value}; max-age=${maxAge}`;
@@ -11,7 +17,7 @@ function GetCookie(parameter) {
   const data = JSON.parse(parameter);
   const objectName = data.objectName;
   const functionName = data.functionName;
-  const cookie = GetCookieValue(data.value);
+  const cookie = decrypt(GetCookieValue(data.value), decryptKey);
 
   unityInstance.SendMessage(objectName, functionName, cookie);
 }

@@ -64,8 +64,7 @@ app.get("/", async (c) => {
   ];
 
   const myScore = user ? await prisma.ranking.findFirst({
-  where: {userId: user.id },
-  }) || {
+    where: {userId: user.id }, }) || {
     updatedAt: setDateId(new Date()),
     highScore: 0,
     monthly: 0,
@@ -87,37 +86,50 @@ app.get("/", async (c) => {
       "ScrollCuBE",
       html`
         ${tag.header(user, myScore ? myScore.distance : undefined)}
-
-        ${tag.gameDisplay}
-        ${tag.form}
-
-        <h2>スコアランキング</h2>
-        <p id="ranking-tab">
-        ${onlineScore.map(
-        (rankings) => html`
-          <a href="#ranking-${onlineScore.indexOf(rankings)}">${rankings.title}</a>
-        `)}
-        </p>
-        <div id="ranking">
-        ${onlineScore.map(
-        (rankings) => html`
-          <div id="ranking-${onlineScore.indexOf(rankings)}" style="width: fit-content;">
-            ${tag.ranking0(rankings)}
-            ${tag.ranking1(rankings, myScore, user)}
+        <main id="main" style="width: 900px;">
+          <div style="display: inline-block;">
+            ${tag.gameDisplay}
+            <h2>オンラインスコア</h2>
+            ${tag.form}
           </div>
-          `)}
-        </div>
+          <div id="right" style="display: flex; flex-direction: column;">
+            <div id="ranking-table" class="ms-3">
+              <h3 style="width: 25rem;">ランキング</h3>
+              <div class="ms-2">
+                <p id="ranking-tab">
+                  ${onlineScore.map(
+                  (rankings) => html`
+                    <a href="#ranking-${onlineScore.indexOf(rankings)}">${rankings.title}</a>
+                  `)}
+                </p>
+                <div id="ranking" class="mb-3">
+                  ${onlineScore.map(
+                  (rankings) => html`
+                    <div id="ranking-${onlineScore.indexOf(rankings)}" style="width: fit-content;">
+                      ${tag.ranking0(rankings, user ? user.id : 0)}
+                      ${tag.ranking1(rankings, myScore, user)}
+                    </div>
+                  `)}
+                </div>
+              </div>
+            </div>
+            <div>
+              <h2 id="help-h2">遊び方・ゲームシステム</h2>
+              ${tag.help}
+            </div>
+          </div>
+        </main>
 
-        <h2>遊び方</h2>
-
+        <script src="unity-bridge.js"></script>
         <script>
         ${tag.gameScript0}
         ${tag.gameScript1}
         ${tag.gameScript2}
         ${tag.formScript(myScore)}
         ${tag.rankingScript}
+        ${tag.layoutScript0}
+        ${tag.layoutScript1}
         </script>
-        <script src="unity-bridge.js"></script>
       `,
     ),
   );
