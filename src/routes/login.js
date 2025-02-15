@@ -16,10 +16,12 @@ app.get("/", (c) => {
             <h1 class="text-light navbar-brand mx-auto">ScrollCuBE WEB Edition</h1>
           </div>
         </nav>
-        <h1>Login</h1>
-        <a href="/auth/github" class="btn ${user ? 'btn-secondary':'btn-primary'}">GitHub でログイン</a>
-        <p>${user ? `現在 ${user.login} でログイン中`: ''}</p>
-        <a href="/" class="btn btn-warning">戻る</a>
+        <main  style="max-width: 900px;">
+          <h1>Login</h1>
+          <a href="/auth/github" class="btn ${user ? 'btn-secondary':'btn-primary'}">GitHub でログイン</a>
+          <p>${user ? `現在 ${user.login} でログイン中`: ''}</p>
+          <a href="/" class="btn btn-warning">戻る</a>
+        </main>
       `,
     ),
   );

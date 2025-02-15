@@ -8,9 +8,14 @@ const header = (user, distance) => { return html`
         <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
           ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
-          ${user ? html`<li class="dropdown-item">最高距離: ${(distance / 100).toFixed(2)}m</li>` : "" }
-          <li><button class="btn dropdown-item" type="button" onclick="change()">レイアウト切替</button></li>
-          <li><a class="dropdown-item" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
+          <li class="dropdown-item"><small>▼レイアウト▼</small></li>
+          <li id="layout-btns" style="display: flex; height: 2rem;">
+            <button class="btn dropdown-item layout-icon" type="button" onclick="change(0, true)"><img src="/images/layout-icon-00.svg" alt="00"></button>
+            <button class="btn dropdown-item layout-icon" type="button" onclick="change(1, true)"><img src="/images/layout-icon-01.svg" alt="01"></button>
+            <button class="btn dropdown-item layout-icon" type="button" onclick="change(2, true)"><img src="/images/layout-icon-02.svg" alt="02"></button>
+          </li>
+          <li><a class="dropdown-item${user ? " bg-danger-subtle" : ""}" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
+          <li class="dropdown-item"><small>最高距離: ${user ? (distance / 100).toFixed(2) : "--.--" }m</small></li>
         </ul>
       </div>
     </div>
@@ -180,46 +185,49 @@ const formScript = (myScore) => { return html`
   });
 `};
 
-const ranking0 = (rankings, id) => {
-  const emptyRanking = Array(10).fill( {
+const ranking0 = (rankings, id, length, type) => {
+  const emptyRanking = Array(length).fill( {
     user: { username: '---' },
     highScore: '---',
     monthly: '---',
     daily: '---',
-    distance: '---'
+    distance: '-----',
+    recodedAt: '',
   });
 
   return html`
-    <h4>${rankings.title}</h4>
+    <h4 class="${type ? 'sticky' : ''}">${rankings.title}</h4>
     <table>
-    ${rankings.value.concat(emptyRanking).slice(0, 10).map(
+    ${rankings.value.concat(emptyRanking).slice(0, length).map(
     (ranking, i) => html`
-      <tr class="rank-${i}">
-        <td class="number">${i +1}</td>
-        <td class="ranking-name">${ranking.user.username}${ranking.user.userId === id ? html`<i class="bi-person-square ps-1"></i>` : ''}</td>
-        <td class="result">${ranking[rankings.type]}</td>
+      <tr class="rank-${i<=2 ? i :(i%2)+3}" style="${type && i<=9 ? 'height: 2.2rem;' : ''}">
+        <td class="number" style="${i >= 99 ? 'display: block; transform: scale(0.7, 1) translate(-15%, 0);' : ''}">${i +1}</td>
+        <td class="ranking-name">${ranking.user.username}${ranking.user.userId === id ? html`<i class="bi-person-square ps-1"></i>` : ''}${
+        type === 'highScore' && ranking.recodedAt && i<=9 ? html`<br><small>${new Date(ranking.recodedAt).toLocaleString("ja-JP")}</small>` : ''}</td>
+        <td class="result">${type === 'distance' && ranking.distance !== '-----' ? (ranking.distance /100).toFixed(2)+'m' : ranking[rankings.type]}</td>
       </tr>
     `,
     )}
-      <tr style="background-color: #84e25f">
+      <tr style="background-color: #74da4b">
         <th style="text-align: right; padding-right: 0.3rem;">▼</th>
         <th style="text-align: left; padding-left: 2rem;">マイスコア</th>
         <th style="text-align: right; padding-right: 0.7rem;">▼</th>
       </tr>
-`};
+  `;
+};
 
 const ranking1 = (rankings, myScore, user) => { return html`
   ${myScore 
   ? html`
-    <tr class="rank-${rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) ?? 'my'}" style="height: 1.7rem;">
+    <tr class="rank-${rankings.value.slice(0, 3).indexOf(rankings.value.find(e => e.user.userId == user.id)) ?? '-1'}" style="height: 1.7rem;">
       <td class="my-number" style="font-size: 1.1rem;">${user ? rankings.value.indexOf(rankings.value.find(e => e.user.userId == user.id)) +1
       || html`<span style="font-size: 0.8rem;">圏外</span>` : html`<span style="font-size: 0.8rem;">圏外</span>`}</td>
       <td class="ranking-name">${user.login}</td>
-      <td class="my-number" style="font-size: 0.95rem;">${myScore[rankings.type] || 0}</td>
+      <td class="my-number" style="font-size: 0.95rem;">${myScore ? (rankings.type === 'distance' ? (myScore.distance/100).toFixed(2)+'m' : myScore[rankings.type]) : 0}</td>
     </tr>
   `
   : html`
-    <tr class="rank-my">
+    <tr class="rank--1">
       <td class="my-number "style="font-size: 0.8rem;">圏外</td>
       <td class="ranking-name" style="font-size: 0.8rem;">ゲスト ユーザー</td>
       <td class="my-number">---</td>
@@ -279,24 +287,28 @@ const layoutScript0 = html`
   const right = document.getElementById('right');
   const table = document.getElementById('ranking-table');
   const help = document.getElementById('help-h2');
+  const btns = document.getElementById('layout-btns').getElementsByTagName('button');
+
+  let layout = 0;
+  let autoLayout = -1;
 
   const setLayout = [
     function() {
-      main.style.width = "900px";
+      main.style.maxWidth = "900px";
       main.style.display = "block";
       right.style.flexDirection = "column";
       help.style.display = "block";
       table.classList.add('ms-3');
     },
     function() {
-      main.style.width = "1000px";
+      main.style.maxWidth = "1000px";
       main.style.display = "block";
       right.style.flexDirection = "row";
       help.style.display = "none";
       table.classList.remove('ms-3');
     },
     function() {
-      main.style.width = "1400px";
+      main.style.maxWidth = "1400px";
       main.style.display = "flex";
       right.style.flexDirection = "column-reverse";
       help.style.display = "none";
@@ -306,20 +318,119 @@ const layoutScript0 = html`
 `;
 
 const layoutScript1 = html`
-  let layout = 0;
+  function buttonActive(changed) {
+    for(let i=0; i<pages.length; i++) {
+      if(i === changed) {
+        if(i === layout) {
+          btns[i].disabled = true;
+          btns[i].classList.add('bg-primary-subtle');
+        }
+      } else {
+        const organized = responsive(i);
+        const checked = btns[i].classList.contains('bg-primary-subtle');
+        const disabled = btns[i].classList.contains('bg-dark-subtle');
+        
+        if(changed === layout && checked) {
+          btns[i].classList.remove('bg-primary-subtle');
+          if(organized === -1) {
+            btns[i].disabled = false;
+          } else if(organized !== -1) {
+            btns[i].classList.add('bg-dark-subtle');
+          }
+        }
+        if(organized !== -1 && !disabled && !checked) {
+          btns[i].disabled = true;
+          btns[i].classList.add('bg-dark-subtle');
+        }
+        else if(organized === -1 && disabled) {
+          btns[i].disabled = false;
+          btns[i].classList.remove('bg-dark-subtle');
+        }
+      }
+    }
+  }
+`;
+
+const layoutScript2 = html`
+  function responsive (type) {
+    const width = window.innerWidth;
+
+    if(width < 1000) {
+      return (type > 0 ? 0 : -1);
+    } else if(width < 1400) {
+      return (type > 1 ? 1 : -1);
+    } else {
+      return -1;
+    }
+  }
+
+  function change(value, save) {
+    if(save) {
+      document.cookie = \`layout=\${value}; max-age=\${366 * 86400}\`;
+      layout = value;
+    }
+    if(value !== -1) {
+      autoLayout = responsive(value);
+      setLayout[(autoLayout === -1 ? value : autoLayout)]();
+    }
+    
+    buttonActive(value);
+  }
 
   window.addEventListener('DOMContentLoaded', function () {
     const value = GetCookieValue('layout');
-    layout = isNaN('value') ? 0 : value % 3;
-    setLayout[layout]();
+    layout = isNaN(value) ? 0 : value % 3;
+
+    change(layout, false);
   });
 
-  function change() {
-    layout = (layout +1) % 3;
-    setLayout[layout]();
-  
-    document.cookie = \`layout=\${layout}; max-age=\${366 * 86400}\`;
+  window.addEventListener('resize', function () {
+    autoLayout = responsive(layout);
+    change(autoLayout === -1 ? layout  : autoLayout, undefined);
+  });
+`;
+
+const rHeader = (user, myScore) => { return html`
+  <nav class="navbar fixed-top bg-info">
+    <div class="container-fluid">
+      <a href="/" class="ms-5"><button class="btn btn-outline-light" type="button"><i class="bi-arrow-left-square pe-1"></i>戻る</button></a>
+      <h1 class="text-light navbar-brand mx-auto">ScrollCuBE WEB Edition</h1>
+      <button class="btn btn-outline-light me-3" type="button" onclick="rankingChange()">ランキング切替<i class="bi-files ps-1"></i></button>
+      <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
+          ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
+          <li><a class="dropdown-item" href="/">戻る</a></li>
+          <li><a class="dropdown-item${user ? " bg-danger-subtle" : ""}" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+`};
+
+const rScript = html`
+  const pages = document.getElementById('ranking').getElementsByTagName('div');
+  let ranking = 0;
+
+  function rankingChange() {
+    if(ranking === 0) {
+      ranking = 1;
+      pages[0].style.display = "none";
+      pages[1].style.display = "none";
+      pages[2].style.display = "block";
+      pages[3].style.display = "block";
+    }
+    else {
+      ranking = 0;
+      pages[0].style.display = "block";
+      pages[1].style.display = "block";
+      pages[2].style.display = "none";
+      pages[3].style.display = "none";
+    }
+      console.log('absnz')
   }
+
+  window.addEventListener('DOMContentLoaded', rankingChange);
 `;
 
 module.exports = { 
@@ -336,4 +447,8 @@ module.exports = {
   help,
   layoutScript0,
   layoutScript1,
+  layoutScript2,
+  rHeader,
+  rScript,
 };
+

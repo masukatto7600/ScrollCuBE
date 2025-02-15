@@ -19,6 +19,7 @@ const prisma = new PrismaClient({ log: [ 'query' ] });
 const indexRouter = require("./routes/index");
 const loginRouter = require("./routes/login");
 const logoutRouter = require("./routes/logout");
+const rankingRouter = require("./routes/ranking");
 
 const app = new Hono();
 
@@ -84,6 +85,7 @@ app.get("/auth/github", async (c) => {
 app.route("/", indexRouter);
 app.route("/login", loginRouter);
 app.route("/logout", logoutRouter);
+app.route("/ranking", rankingRouter);
 
 // 404 Not Found
 app.notFound((c) => {

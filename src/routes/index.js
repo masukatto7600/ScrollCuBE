@@ -19,7 +19,6 @@ app.get("/", async (c) => {
     take: 100,
     select: {
       user: true,
-      recodedAt: true,
       highScore: true,
     },
   });
@@ -86,7 +85,7 @@ app.get("/", async (c) => {
       "ScrollCuBE",
       html`
         ${tag.header(user, myScore ? myScore.distance : undefined)}
-        <main id="main" style="width: 900px;">
+        <main id="main" style="max-width: 900px;">
           <div style="display: inline-block;">
             ${tag.gameDisplay}
             <h2>オンラインスコア</h2>
@@ -95,25 +94,29 @@ app.get("/", async (c) => {
           <div id="right" style="display: flex; flex-direction: column;">
             <div id="ranking-table" class="ms-3">
               <h3 style="width: 25rem;">ランキング</h3>
-              <div class="ms-2">
-                <p id="ranking-tab">
-                  ${onlineScore.map(
-                  (rankings) => html`
-                    <a href="#ranking-${onlineScore.indexOf(rankings)}">${rankings.title}</a>
-                  `)}
-                </p>
-                <div id="ranking" class="mb-3">
-                  ${onlineScore.map(
-                  (rankings) => html`
-                    <div id="ranking-${onlineScore.indexOf(rankings)}" style="width: fit-content;">
-                      ${tag.ranking0(rankings, user ? user.id : 0)}
-                      ${tag.ranking1(rankings, myScore, user)}
-                    </div>
-                  `)}
+              <div class="ms-1 mb-3" style="display: flex; align-items:flex-end;">
+                <div style="min-width: fit-content;">
+                  <p id="ranking-tab">
+                    ${onlineScore.map(
+                    (rankings) => html`
+                      <a href="#ranking-${onlineScore.indexOf(rankings)}">${rankings.title}</a>
+                    `)}
+                  </p>
+                  <div id="ranking">
+                    ${onlineScore.map(
+                    (rankings) => html`
+                      <div id="ranking-${onlineScore.indexOf(rankings)}" style="width: fit-content;">
+                        ${tag.ranking0(rankings, user ? user.id : 0, 10)}
+                        ${tag.ranking1(rankings, myScore, user)}
+                      </div>
+                    `)}
+                  </div>
                 </div>
+                <a href="/ranking" class="ms-2" style="min-width: fit-content;"><button class="btn btn-primary px-2 py-1"><small>もっと見る<i class="bi-arrow-right-square ps-1"></i></small></button></a>
               </div>
+              
             </div>
-            <div>
+            <div style="height: fit-content;">
               <h2 id="help-h2">遊び方・ゲームシステム</h2>
               ${tag.help}
             </div>
@@ -125,10 +128,13 @@ app.get("/", async (c) => {
         ${tag.gameScript0}
         ${tag.gameScript1}
         ${tag.gameScript2}
+        </script>
+        <script>
         ${tag.formScript(myScore)}
         ${tag.rankingScript}
         ${tag.layoutScript0}
         ${tag.layoutScript1}
+        ${tag.layoutScript2}
         </script>
       `,
     ),
