@@ -1,7 +1,4 @@
-main {
-  margin: 80px auto 0;
-  padding: 0 50px;
-}
+main { margin: 80px auto 0; padding: 0 50px }
 
 #ranking-tab, #ranking {
   font:
@@ -11,17 +8,11 @@ main {
     sans-serif;
 }
 
-tr {
-  padding: 2px 0;
-}
+tr { padding: 2px 0 }
 
-p {
-  margin-bottom: 0.3rem;
-}
+p { margin-bottom: 0.3rem }
 
-.rank-0 {
-  background-image: url(../images/1st.png);
-}
+.rank-0 { background-image: url(../images/1st.png)}
 
 .rank-1 {
   background-image: url(../images/2nd.png);

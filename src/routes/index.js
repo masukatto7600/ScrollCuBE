@@ -88,7 +88,7 @@ app.get("/", async (c) => {
         <main id="main" style="max-width: 900px;">
           <div style="display: inline-block;">
             ${tag.gameDisplay}
-            <h2>オンラインスコア</h2>
+            <h2 class="mt-5">オンラインスコア</h2>
             ${tag.form}
           </div>
           <div id="right" style="display: flex; flex-direction: column;">
