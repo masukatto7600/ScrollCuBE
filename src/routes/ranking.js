@@ -95,23 +95,25 @@ app.get("/", async (c) => {
       "ScrollCuBE",
       html`
         ${tag.rHeader(user, myScore)}
-        <main style="max-width: 900px;">
-            <div id="ranking" style="display: flex" class="mb-3">
-              ${onlineScore.map(
-              (rankings) => html`
-                <div id="ranking-${onlineScore.indexOf(rankings)}" style="min-width: fit-content;">
+        <main style="width: 900px;">
+          <div id="ranking" style="display: flex" class="mb-3">
+            ${onlineScore.map(
+            (rankings) => html`
+                <div id="ranking-${onlineScore.indexOf(rankings)}" style="min-width: fit-content; margin: 0 auto;">
                   ${tag.ranking0(rankings, user ? user.id : 0, 100, rankings.type)}
                   ${tag.ranking1(rankings, myScore, user)}
                 </div>
-              `)}
-            </div>
-            <div class="mb-2 ms-1">
-              <a href="/"><button class="btn btn-warning btn-outline-light" type="button"><i class="bi-arrow-left-square pe-1"></i>戻る</button></a>
-              <a href="#"><button class="btn btn-success btn-outline-light" type="button">上へ<i class="bi-arrow-up-square ps-1"></i></button></a>
-              </div>
+            `)}
+          </div>
+          <div class="mb-2 ms-4">
+            <a href="/"><button class="btn btn-warning btn-outline-light" type="button"><i class="bi-arrow-left-square pe-1"></i>戻る</button></a>
+            <a href="#"><button class="btn btn-success btn-outline-light" type="button">上へ<i class="bi-arrow-up-square ps-1"></i></button></a>
+          </div>
         </main>
+      `,
+      html`
         <script>
-        ${tag.rScript}
+          ${tag.rScript}
         </script>
       `,
     ),

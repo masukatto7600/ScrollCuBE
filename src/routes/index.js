@@ -85,7 +85,7 @@ app.get("/", async (c) => {
       "ScrollCuBE",
       html`
         ${tag.header(user, myScore ? myScore.distance : undefined)}
-        <main id="main" style="max-width: 900px;">
+        <main id="main" style="width: 900px;">
           <div style="display: inline-block;">
             ${tag.gameDisplay}
             <h2 class="mt-5">オンラインスコア</h2>
@@ -122,19 +122,20 @@ app.get("/", async (c) => {
             </div>
           </div>
         </main>
-
+      `,
+      html`
         <script src="unity-bridge.js"></script>
         <script>
-        ${tag.gameScript0}
-        ${tag.gameScript1}
-        ${tag.gameScript2}
+          ${tag.gameScript0}
+          ${tag.gameScript1}
+          ${tag.gameScript2}
         </script>
         <script>
-        ${tag.formScript(myScore)}
-        ${tag.rankingScript}
-        ${tag.layoutScript0}
-        ${tag.layoutScript1}
-        ${tag.layoutScript2}
+          ${tag.formScript(myScore)}
+          ${tag.rankingScript}
+          ${tag.layoutScript0}
+          ${tag.layoutScript1}
+          ${tag.layoutScript2}
         </script>
       `,
     ),

@@ -200,7 +200,7 @@ const ranking0 = (rankings, id, length, type) => {
     <table>
     ${rankings.value.concat(emptyRanking).slice(0, length).map(
     (ranking, i) => html`
-      <tr class="rank-${i<=2 ? i :(i%2)+3}" style="${type && i<=9 ? 'height: 2.2rem;' : ''}">
+      <tr class="rank-${i<=2 ? i :(i%2)+3}" style="${type && i<=9 ? 'height: 2.3rem;' : ''}">
         <td class="number" style="${i >= 99 ? 'display: block; transform: scale(0.7, 1) translate(-15%, 0);' : ''}">${i +1}</td>
         <td class="ranking-name">${ranking.user.username}${ranking.user.userId === id ? html`<i class="bi-person-square ps-1"></i>` : ''}${
         type === 'highScore' && ranking.recodedAt && i<=9 ? html`<br><small>${new Date(ranking.recodedAt).toLocaleString("ja-JP")}</small>` : ''}</td>
@@ -294,21 +294,21 @@ const layoutScript0 = html`
 
   const setLayout = [
     function() {
-      main.style.maxWidth = "900px";
+      main.style.width = "900px";
       main.style.display = "block";
       right.style.flexDirection = "column";
       help.style.display = "block";
       table.classList.add('ms-3');
     },
     function() {
-      main.style.maxWidth = "1000px";
+      main.style.width = "1000px";
       main.style.display = "block";
       right.style.flexDirection = "row";
       help.style.display = "none";
       table.classList.remove('ms-3');
     },
     function() {
-      main.style.maxWidth = "1400px";
+      main.style.width = "1400px";
       main.style.display = "flex";
       right.style.flexDirection = "column-reverse";
       help.style.display = "none";

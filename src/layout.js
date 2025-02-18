@@ -1,6 +1,6 @@
 const { html } = require("hono/html");
 
-function layout(c, title, body) {
+function layout(c, title, body, script) {
   return html`
     <!doctype html>
     <html>
@@ -29,6 +29,13 @@ function layout(c, title, body) {
       </head>
       <body class="bg-info-subtle" data-bs-theme="light">
         ${body}
+        <div id="footer">
+          <div class="footer mt-2 pt-5 pb-3 bg-info container-fluid">
+            <div class="text-light text-center navbar-brand">ScrollCuBE / masukatto</div>
+            <a href="/" class="text-light ms-4">TOPへ</a>
+          </div>
+        </div>
+        ${script}
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
           integrity="sha256-qlPVgvl+tZTCpcxYJFdHB/m6mDe84wRr+l81VoYPTgQ="
           crossorigin="anonymous"></script>
