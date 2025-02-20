@@ -89,9 +89,9 @@ app.get("/", async (c) => {
           <div style="display: inline-block;">
             ${tag.gameDisplay}
             <h2 class="mt-5">オンラインスコア</h2>
-            ${tag.form}
+            ${tag.form(myScore)}
           </div>
-          <div id="right" style="display: flex; flex-direction: column;">
+          <div id="right" style="display: flex; flex-direction: column; margin-bottom: auto;">
             <div id="ranking-table" class="ms-3">
               <h3 style="width: 25rem;">ランキング</h3>
               <div class="ms-1 mb-3" style="display: flex; align-items:flex-end;">
@@ -114,7 +114,6 @@ app.get("/", async (c) => {
                 </div>
                 <a href="/ranking" class="ms-2" style="min-width: fit-content;"><button class="btn btn-primary px-2 py-1"><small>もっと見る<i class="bi-arrow-right-square ps-1"></i></small></button></a>
               </div>
-              
             </div>
             <div style="height: fit-content;">
               <h2 id="help-h2">遊び方・ゲームシステム</h2>
@@ -124,14 +123,13 @@ app.get("/", async (c) => {
         </main>
       `,
       html`
-        <script src="unity-bridge.js"></script>
+        <script src="/javascripts/score-recorder.js"></script>
         <script>
           ${tag.gameScript0}
           ${tag.gameScript1}
           ${tag.gameScript2}
         </script>
         <script>
-          ${tag.formScript(myScore)}
           ${tag.rankingScript}
           ${tag.layoutScript0}
           ${tag.layoutScript1}

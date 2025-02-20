@@ -92,7 +92,7 @@ app.get("/", async (c) => {
   return c.html(
     layout(
       c,
-      "ScrollCuBE",
+      "ランキング / ScrollCuBE",
       html`
         ${tag.rHeader(user, myScore)}
         <main style="width: 900px;">
@@ -105,9 +105,12 @@ app.get("/", async (c) => {
                 </div>
             `)}
           </div>
-          <div class="mb-2 ms-4">
-            <a href="/"><button class="btn btn-warning btn-outline-light" type="button"><i class="bi-arrow-left-square pe-1"></i>戻る</button></a>
-            <a href="#"><button class="btn btn-success btn-outline-light" type="button">上へ<i class="bi-arrow-up-square ps-1"></i></button></a>
+          <div class="mb-2 ms-4" style="display: flex;">
+            <div style="flex: 1;">
+              <a href="/"><button class="btn btn-warning" type="button"><i class="bi-arrow-left-square pe-1"></i>戻る</button></a>
+            </div>
+            <button class="btn btn-primary me-2" type="button" onclick="rankingChange()">ランキング切替<i class="bi-files ps-1"></i></button>
+            <a href="#" class="me-4"><button class="btn btn-success" type="button">上へ<i class="bi-arrow-up-square ps-1"></i></button></a>
           </div>
         </main>
       `,

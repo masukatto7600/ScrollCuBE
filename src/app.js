@@ -20,6 +20,7 @@ const indexRouter = require("./routes/index");
 const loginRouter = require("./routes/login");
 const logoutRouter = require("./routes/logout");
 const rankingRouter = require("./routes/ranking");
+const secretRouter = require("./routes/secret");
 
 const app = new Hono();
 
@@ -86,6 +87,7 @@ app.route("/", indexRouter);
 app.route("/login", loginRouter);
 app.route("/logout", logoutRouter);
 app.route("/ranking", rankingRouter);
+app.route("/secret", secretRouter);
 
 // 404 Not Found
 app.notFound((c) => {

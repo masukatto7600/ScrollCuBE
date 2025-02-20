@@ -17,15 +17,6 @@ function layout(c, title, body, script) {
         <link rel="stylesheet" href="/ScrollCuBE/TemplateData/style.css">
         <link rel="stylesheet" href="/stylesheets/style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-        <script>
-          const encrypt = (src, key) => CryptoJS.AES.encrypt(src, key);
-
-          const decrypt = (des, key) => {
-            const decrypted = CryptoJS.AES.decrypt(des, key);
-            const utf8 = decrypted.toString(CryptoJS.enc.Utf8);
-            return utf8;
-          };
-        </script>
       </head>
       <body class="bg-info-subtle" data-bs-theme="light">
         ${body}

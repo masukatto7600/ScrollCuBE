@@ -9,7 +9,7 @@ app.get("/", (c) => {
   return c.html(
     layout(
       c,
-      "ログイン / ScrollCuBE",
+      "シークレット / ScrollCuBE",
       html`
         <nav class="navbar fixed-top bg-info">
           <div class="container-fluid">
@@ -26,12 +26,7 @@ app.get("/", (c) => {
         </nav>
         <main style="min-width: 100%;">
           <div style="max-width: 600px; margin: 0 auto;">
-            <h3 style="width: 100%;">Login</h3>
-            <div class="ms-4 mt-3">
-              <a href="/auth/github" class="btn ${user ? 'btn-secondary':'btn-primary'}">GitHub でログイン</a>
-              <p>${user ? `現在 ${user.login} でログイン中`: ''}</p>
-              <a href="/" class="btn btn-warning">戻る</a>
-            </div>
+            <h3 style="width: 100%;">よくぞ辿り着きましたね</h3>
           </div>
         </main>
       `,

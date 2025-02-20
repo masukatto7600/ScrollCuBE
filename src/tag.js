@@ -14,7 +14,7 @@ const header = (user, distance) => { return html`
             <button class="btn dropdown-item layout-icon" type="button" onclick="change(1, true)"><img src="/images/layout-icon-01.svg" alt="01"></button>
             <button class="btn dropdown-item layout-icon" type="button" onclick="change(2, true)"><img src="/images/layout-icon-02.svg" alt="02"></button>
           </li>
-          <li><a class="dropdown-item${user ? " bg-danger-subtle" : ""}" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
+          <li><a class="dropdown-item${user ? " bg-danger-subtle" : ''}" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
           <li class="dropdown-item"><small>最高距離: ${user ? (distance / 100).toFixed(2) : "--.--" }m</small></li>
         </ul>
       </div>
@@ -74,7 +74,7 @@ const gameScript1 = html`
     frameworkUrl: buildUrl + "/ScrollCuBE.framework.js",
     codeUrl: buildUrl + "/ScrollCuBE.wasm",
     streamingAssetsUrl: "StreamingAssets",
-    companyName: "dokomiCompany",
+    companyName: "defaultCompany",
     productName: "ScrollCuBE",
     productVersion: "1.0",
     showBanner: unityShowBanner,
@@ -120,69 +120,26 @@ const gameScript2 = html`
   document.body.appendChild(script);
 `;
 
-const form = html`
+const form = (myScore) => { return html`
   <div class="ms-3">
     <p>このフォームを送信することで、オンラインスコアランキングに参加・スコアを更新できます。</p>
     <ul>
       <li>ランキング上の「マイスコア」を更新した場合に自動入力されます。</li>
-      <li class="fw-bold"><span class="text-danger">ページを再読み込みすると入力されたデータが消えます。</span>また、過去の記録は送信できません。</li>
-      <li>ゲストユーザーは送信できません。</li>
+      <li>記録は15分間、またはページを再読み込みするまで保持されます。なお、<b class="text-danger">過去の記録は送信できません</b>。</li>
+      <li>ゲストユーザーは送信できません。15分以内に認証を完了させてください。</li>
     </ul>
     <form method="post">
       <label for="daily">本日</label>
-      <input type="number" name="daily" id="daily" style="width:4em;" readonly>
+      <input type="text" name="daily" id="daily" style="width:4em;" placeholder="${myScore ? myScore.daily : ''}" readonly>
       <label for="monthly">月間</label>
-      <input type="number" name="monthly" id="monthly" style="width:4em;" readonly>
+      <input type="text" name="monthly" id="monthly" style="width:4em;" placeholder="${myScore ? myScore.monthly : ''}" readonly>
       <label for="allOver">総合</label>
-      <input stype="number" name="allOver" id="allOver" style="width:4em;" readonly>
+      <input stype="text" name="allOver" id="allOver" style="width:4em;" placeholder="${myScore ? myScore.highScore : ''}" readonly>
       <label for="distance">最高距離</label>
-      <input type="number" name="distance" id="distance" style="width:5em;" readonly>
+      <input type="text" name="distance" id="distance" style="width:5em;" placeholder="${myScore ? myScore.distance : ''}" readonly>
       <button type="submit" onclick="send()" id="submit_button" class="btn btn-success" disabled><i id="send-icon" class="bi-send"></i></button>
     </form>
   </div>
-`;
-
-const formScript = (myScore) => { return html`
-  const daily = document.getElementById('daily');
-  const distance = document.getElementById('distance');
-  const button = document.getElementById('submit_button');
-  const icon = document.getElementById('send-icon');
-  let isSend = false;
-
-  if(!${Boolean(myScore).toString()}) {
-    button.classList.remove('btn-success');
-    button.classList.add('btn-secondary');
-    icon.classList.remove('bi-send');
-    icon.classList.add('bi-send-slash');
-  }
-
-  function buttonActive() {
-    if(${Boolean(myScore).toString()} && (daily.value || distance.value)) {
-      button.disabled = false;
-      icon.classList.remove('bi-send');
-      icon.classList.add('bi-send-check-fill');
-    }
-  }
-
-  const getMyScore = () => {
-    return ${myScore ? `{
-      allOver: ${myScore.highScore},
-      monthly: ${myScore.monthly},
-      daily: ${myScore.daily},
-      distance: ${myScore.distance},
-    }` : 'undefined'};
-  };
-
-  function send() {
-  isSend = true;
-  }
-
-  window.addEventListener('beforeunload', function (event) {
-    if(!(button.disabled || isSend)) {
-      event.preventdokomi()
-      event.returnValue = ''
-    }
-  });
 `};
 
 const ranking0 = (rankings, id, length, type) => {
@@ -237,14 +194,14 @@ const ranking1 = (rankings, myScore, user) => { return html`
 `};
 
 const rankingScript = html`
-  const tabs = document.getElementById('ranking-tab').getElementsByTagName('a');
-  const pages = document.getElementById('ranking').getElementsByTagName('div');
+const tabs = document.getElementById('ranking-tab').getElementsByTagName('a');
+const pages = document.getElementById('ranking').getElementsByTagName('div');
 
-  function changeTab() {
-    let targetid = this.href.substring(this.href.indexOf('#')+1,this.href.length);
+function changeTab() {
+  let targetid = this.href.substring(this.href.indexOf('#')+1,this.href.length);
 
-    for(let i=0; i<pages.length; i++) {
-        if( pages[i].id != targetid ) {
+  for(let i=0; i<pages.length; i++) {
+        if(pages[i].id !== targetid) {
           pages[i].style.display = "none";
         }
         else {
@@ -315,7 +272,7 @@ const layoutScript0 = html`
       table.classList.add('ms-3');
     },
   ];
-`;
+`
 
 const layoutScript1 = html`
   function buttonActive(changed) {
@@ -400,8 +357,9 @@ const rHeader = (user, myScore) => { return html`
         <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
           ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
-          <li><a class="dropdown-item" href="/">戻る</a></li>
-          <li><a class="dropdown-item${user ? " bg-danger-subtle" : ""}" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
+          <li><a href="/" class="dropdown-item">戻る</a></li>
+          <li><a class="dropdown-item${user ? " bg-danger-subtle" : ''}" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
+          <li class="dropdown-item"><small>ハイスコア: ${user ? myScore.highScore : "----" }<br>最高距離: ${user ? (myScore.distance / 100).toFixed(2) : "--.--" }m</small></li>
         </ul>
       </div>
     </div>
@@ -427,7 +385,6 @@ const rScript = html`
       pages[2].style.display = "none";
       pages[3].style.display = "none";
     }
-      console.log('absnz')
   }
 
   window.addEventListener('DOMContentLoaded', rankingChange);
@@ -440,7 +397,6 @@ module.exports = {
   gameScript1,
   gameScript2,
   form,
-  formScript,
   ranking0,
   ranking1,
   rankingScript,
@@ -451,4 +407,3 @@ module.exports = {
   rHeader,
   rScript,
 };
-
