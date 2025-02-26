@@ -134,7 +134,7 @@ const form = (myScore) => { return html`
       <label for="monthly">月間</label>
       <input type="text" name="monthly" id="monthly" style="width:4em;" placeholder="${myScore ? myScore.monthly : ''}" readonly>
       <label for="allOver">総合</label>
-      <input stype="text" name="allOver" id="allOver" style="width:4em;" placeholder="${myScore ? myScore.highScore : ''}" readonly>
+      <input type="text" name="allOver" id="allOver" style="width:4em;" placeholder="${myScore ? myScore.highScore : ''}" readonly>
       <label for="distance">最高距離</label>
       <input type="text" name="distance" id="distance" style="width:5em;" placeholder="${myScore ? myScore.distance : ''}" readonly>
       <button type="submit" onclick="send()" id="submit_button" class="btn btn-success" disabled><i id="send-icon" class="bi-send"></i></button>
@@ -223,6 +223,10 @@ function changeTab() {
     tabs[i].onclick = changeTab;
   }
   tabs[0].onclick();
+
+  function send() {
+    document.cookie = 'myscore=; max-age=0';
+  }
 `;
 
 const help = html`
