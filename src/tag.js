@@ -1,5 +1,6 @@
 const { html } = require("hono/html");
 
+//メインページのヘッダー
 const header = (user, distance) => { return html`
   <nav class="navbar fixed-top bg-info">
     <div class="container-fluid">
@@ -22,6 +23,7 @@ const header = (user, distance) => { return html`
   </nav>
 `};
 
+//ゲーム画面
 const gameDisplay = html`
   <div id="unity-container" class="unity-desktop">
     <canvas id="unity-canvas" width=800 height=450 tabindex="-1"></canvas>
@@ -40,6 +42,7 @@ const gameDisplay = html`
   </div>
 `;
 
+//ゲームのスクリプト
 const gameScript0 = html`
   var container = document.querySelector("#unity-container");
   var canvas = document.querySelector("#unity-canvas");
@@ -120,6 +123,7 @@ const gameScript2 = html`
   document.body.appendChild(script);
 `;
 
+//スコア送信フォーム
 const form = (myScore) => { return html`
   <div class="ms-3">
     <p>このフォームを送信することで、オンラインスコアランキングに参加・スコアを更新できます。</p>
@@ -142,6 +146,7 @@ const form = (myScore) => { return html`
   </div>
 `};
 
+//スコアランキング
 const ranking0 = (rankings, id, length, type) => {
   const emptyRanking = Array(length).fill( {
     user: { username: '---' },
@@ -173,6 +178,7 @@ const ranking0 = (rankings, id, length, type) => {
   `;
 };
 
+//スコアランキングのマイスコア部分
 const ranking1 = (rankings, myScore, user) => { return html`
   ${myScore 
   ? html`
@@ -193,42 +199,44 @@ const ranking1 = (rankings, myScore, user) => { return html`
   </table>
 `};
 
+//ランキングの見た目を整える
 const rankingScript = html`
-const tabs = document.getElementById('ranking-tab').getElementsByTagName('a');
-const pages = document.getElementById('ranking').getElementsByTagName('div');
+  const tabs = document.getElementById('ranking-tab').getElementsByTagName('a');
+  const pages = document.getElementById('ranking').getElementsByTagName('div');
 
-function changeTab() {
-  let targetid = this.href.substring(this.href.indexOf('#')+1,this.href.length);
+  function changeTab() {
+    let targetid = this.href.substring(this.href.indexOf('#')+1,this.href.length);
 
-  for(let i=0; i<pages.length; i++) {
-        if(pages[i].id !== targetid) {
-          pages[i].style.display = "none";
-        }
-        else {
-          pages[i].style.display = "block";
-        }
+    for(let i=0; i<pages.length; i++) {
+          if(pages[i].id !== targetid) {
+            pages[i].style.display = "none";
+          }
+          else {
+            pages[i].style.display = "block";
+          }
+      }
+      for(let i=0; i<tabs.length; i++) {
+          tabs[i].style.zIndex = "0";
+          tabs[i].style.backgroundColor = "#e5f8dd";
+
+      }
+      this.style.zIndex = "1";
+      this.style.backgroundColor = "#c7fbb3"
+
+      return false;
     }
+
     for(let i=0; i<tabs.length; i++) {
-        tabs[i].style.zIndex = "0";
-        tabs[i].style.backgroundColor = "#e5f8dd";
-
+      tabs[i].onclick = changeTab;
     }
-    this.style.zIndex = "1";
-    this.style.backgroundColor = "#c7fbb3"
+    tabs[0].onclick();
 
-    return false;
-  }
-
-  for(let i=0; i<tabs.length; i++) {
-    tabs[i].onclick = changeTab;
-  }
-  tabs[0].onclick();
-
-  function send() {
-    document.cookie = 'myscore=; max-age=0';
-  }
+    function send() {
+      document.cookie = 'myscore=; max-age=0';
+    }
 `;
 
+//遊び方の説明
 const help = html`
   <div class="ms-3">
   <h3>このゲームについて</h3>
@@ -243,6 +251,7 @@ const help = html`
   </div>
 `;
 
+//レイアウトを構成する要素を取得
 const layoutScript0 = html`
   const main = document.getElementById('main');
   const right = document.getElementById('right');
@@ -278,6 +287,7 @@ const layoutScript0 = html`
   ];
 `
 
+//レイアウトを切り替えるスクリプト
 const layoutScript1 = html`
   function buttonActive(changed) {
     for(let i=0; i<pages.length; i++) {
@@ -312,6 +322,7 @@ const layoutScript1 = html`
   }
 `;
 
+//画面サイズによって自動的にレイアウトを切り替え
 const layoutScript2 = html`
   function responsive (type) {
     const width = window.innerWidth;
@@ -334,7 +345,6 @@ const layoutScript2 = html`
       autoLayout = responsive(value);
       setLayout[(autoLayout === -1 ? value : autoLayout)]();
     }
-    
     buttonActive(value);
   }
 
@@ -351,16 +361,18 @@ const layoutScript2 = html`
   });
 `;
 
+//ランキングページのヘッダー
 const rHeader = (user, myScore) => { return html`
   <nav class="navbar fixed-top bg-info">
     <div class="container-fluid">
-      <a href="/" class="ms-5"><button class="btn btn-outline-light" type="button"><i class="bi-arrow-left-square pe-1"></i>戻る</button></a>
+      <a href="/" id="back-btn"><button class="btn btn-outline-light" type="button"><i class="bi-arrow-left-square pe-1"></i>戻る</button></a>
       <h1 class="text-light navbar-brand mx-auto">ScrollCuBE WEB Edition</h1>
-      <button class="btn btn-outline-light me-3" type="button" onclick="rankingChange()">ランキング切替<i class="bi-files ps-1"></i></button>
+      <button id="change-btn" class="btn btn-outline-light me-3" type="button" onclick="rankingChange()">ランキング切替<i class="bi-files ps-1"></i></button>
       <div class="dropdown">
         <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
           ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
+          <li><button id="drop-cng-btn" class="btn dropdown-item bg-info-subtle" type="button" onclick="rankingChange()">ランキング切替<i class="bi-files ps-1"></i></button></li>
           <li><a href="/" class="dropdown-item">戻る</a></li>
           <li><a class="dropdown-item${user ? " bg-danger-subtle" : ''}" href="/${user ? html`logout">ログアウト`: html`login">ログイン`}</a></li>
           <li class="dropdown-item"><small>ハイスコア: ${user ? myScore.highScore : "----" }<br>最高距離: ${user ? (myScore.distance / 100).toFixed(2) : "--.--" }m</small></li>
@@ -370,7 +382,37 @@ const rHeader = (user, myScore) => { return html`
   </nav>
 `};
 
-const rScript = html`
+//ランキングページのヘッダーのレイアウト調整
+const rHeaderScript = html`
+  const backButton = document.getElementById('back-btn');
+  const changeButton = document.getElementById('change-btn');
+  const dropdownButton = document.getElementById('drop-cng-btn');
+
+  function responsive() {
+    const width = window.innerWidth;
+    
+    if(width < 700) {
+      backButton.style.marginLeft = "initial";
+      changeButton.style.display = "none";
+      dropdownButton.style.display = "block";
+    }
+    else if (width < 750) {
+      backButton.style.marginLeft = \`\${width - 700}px\`;
+      changeButton.style.display = "block";
+      dropdownButton.style.display = "none";
+    }
+    else {
+      backButton.style.marginLeft = "50px";
+      changeButton.style.display = "block";
+      dropdownButton.style.display = "none";
+    }
+  }
+
+  window.addEventListener('resize', responsive);
+`;
+
+//ランキングページの表示切り替え
+const rChangeScript = html`
   const pages = document.getElementById('ranking').getElementsByTagName('div');
   let ranking = 0;
 
@@ -391,7 +433,10 @@ const rScript = html`
     }
   }
 
-  window.addEventListener('DOMContentLoaded', rankingChange);
+  window.addEventListener('DOMContentLoaded', function() {
+    rankingChange();
+    responsive();
+  });
 `;
 
 module.exports = { 
@@ -409,5 +454,6 @@ module.exports = {
   layoutScript1,
   layoutScript2,
   rHeader,
-  rScript,
+  rHeaderScript,
+  rChangeScript,
 };

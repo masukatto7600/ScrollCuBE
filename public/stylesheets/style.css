@@ -15,7 +15,6 @@ h4 { font-size: 1.2rem; width: 100%; }
 .result { text-align: right; font-size: 1.2rem; width: 6rem; padding-right: 0.3rem; }
 input { text-align:right; padding-right: 0.35rem; }
 ::placeholder { color: #dcdcdc; }
-
 table {
   border-collapse: collapse;
   border: #0c8516 solid 2px;
@@ -71,3 +70,4 @@ h3 {
 .layout-icon:disabled img { filter: brightness(0) saturate(100%) invert(44%) sepia(9%) saturate(20%) hue-rotate(336deg) brightness(98%) contrast(83%); }
 .fixed_btn { position: fixed; bottom: 10px; right: 10px; padding: 6px 40px; }
 .sticky { position: sticky; display: block; top: 53px; background-color: #c7fbb3; padding: 0.25rem; }
+#back-btn { margin-left: 50px; }

@@ -16,7 +16,7 @@ app.get("/", (c) => {
             <h1 class="text-light navbar-brand mx-auto">ScrollCuBE WEB Edition</h1>
             <div class="dropdown">
               <button class="btn btn-outline-light dropdown-toggle" type="button" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
-                ${user ? html`${user.login}<i class="bi-person-fill-check`: html`ゲスト<i class="bi-person-add`} ms-1"></i></button>
+                シークレット<i class="ms-1 bi-question-circle"></i></button>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
                 ${user ? '' : html`<li><a href="/auth/github" class="dropdown-item">GitHub でログイン</a></li>`}
                 <li><a href="/" class="dropdown-item">戻る</a></li>
@@ -27,6 +27,7 @@ app.get("/", (c) => {
         <main style="min-width: 100%;">
           <div style="max-width: 600px; margin: 0 auto;">
             <h3 style="width: 100%;">よくぞ辿り着きましたね</h3>
+
           </div>
         </main>
       `,

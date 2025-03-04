@@ -14,6 +14,7 @@ const tag = require("../tag");
 app.get("/", async (c) => {
   const { user } = c.get('session') ?? {};
 
+  //DBからスコアランキングを読み込み
   const allOver = await prisma.ranking.findMany({
     orderBy: { highScore: 'desc' },
     take: 100,
@@ -22,7 +23,6 @@ app.get("/", async (c) => {
       highScore: true,
     },
   });
-
   const toDay = await prisma.ranking.findMany({
     where: { updatedAt: setDateId(new Date()) },
     orderBy: { daily: 'desc' },
@@ -32,7 +32,6 @@ app.get("/", async (c) => {
       daily: true,
     },
   });
-
   const monthly = await prisma.ranking.findMany({
     where: { updatedAt: {
         gt: setDateId(new Date()) - 50,
@@ -45,7 +44,6 @@ app.get("/", async (c) => {
       monthly: true,
     },
   });
-
   const onlineScore = [
     {
       value: toDay,
@@ -62,6 +60,7 @@ app.get("/", async (c) => {
     },
   ];
 
+  //マイスコアを読み込み
   const myScore = user ? await prisma.ranking.findFirst({
     where: {userId: user.id }, }) || {
     updatedAt: setDateId(new Date()),
@@ -140,6 +139,7 @@ app.get("/", async (c) => {
   );
 });
 
+//スコア送信
 app.post('/', ensureAuthenticated(), async (c) => {
   const { user } = c.get('session') ?? {};
   const body = await c.req.parseBody();
@@ -167,6 +167,7 @@ app.post('/', ensureAuthenticated(), async (c) => {
   return c.redirect("/");
 });
 
+//データを組み立てる
 function setData(ranking, data) {
   {
     const value = data;
@@ -179,7 +180,8 @@ function setData(ranking, data) {
       value.monthly = 0;
     }
 
-    if(ranking !== null) {
+    //既存のスコアを超えた場合のみ記録する
+    if(ranking != null) {
       if(ranking.highScore > value.highScore) {
         value.highScore = ranking.highScore;
         value.recodedAt = ranking.recodedAt;
@@ -198,6 +200,7 @@ function setData(ranking, data) {
   }
 }
 
+//日付を数値コードに変換
 const setDateId = (date) => {
   return parseInt(`${date.getUTCFullYear()}${date.getUTCMonth()}.${('0'+ date.getUTCDate()).slice(-2)}` *100);
 };

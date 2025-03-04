@@ -10,6 +10,7 @@ const tag = require("../tag");
 app.get("/", async (c) => {
   const { user } = c.get('session') ?? {};
 
+  //DBからスコアランキングを読み込み
   const allOver = await prisma.ranking.findMany({
     orderBy: { highScore: 'desc' },
     take: 100,
@@ -19,7 +20,6 @@ app.get("/", async (c) => {
       highScore: true,
     },
   });
-
   const toDay = await prisma.ranking.findMany({
     where: { updatedAt: setDateId(new Date()) },
     orderBy: { daily: 'desc' },
@@ -29,7 +29,6 @@ app.get("/", async (c) => {
       daily: true,
     },
   });
-
   const monthly = await prisma.ranking.findMany({
     where: { updatedAt: {
         gt: setDateId(new Date()) - 50,
@@ -42,7 +41,6 @@ app.get("/", async (c) => {
       monthly: true,
     },
   });
-
   const distance = await prisma.ranking.findMany({
     orderBy: { distance: 'desc' },
     take: 100,
@@ -51,7 +49,6 @@ app.get("/", async (c) => {
       distance: true,
     },
   });
-
   const onlineScore = [
     {
       value: toDay,
@@ -72,6 +69,7 @@ app.get("/", async (c) => {
     }, 
   ];
 
+  //マイスコアを読み込み
   const myScore = user ? await prisma.ranking.findFirst({
     where: {userId: user.id }, }) || {
     updatedAt: setDateId(new Date()),
@@ -116,7 +114,8 @@ app.get("/", async (c) => {
       `,
       html`
         <script>
-          ${tag.rScript}
+          ${tag.rHeaderScript}
+          ${tag.rChangeScript}
         </script>
       `,
     ),
